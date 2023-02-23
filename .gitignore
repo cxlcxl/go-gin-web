@@ -1,0 +1,9 @@
+.vscode
+.idea
+config/web.yaml
+storage/*
+tmp/*
+web/storage
+.DS_Store
+go.mod
+go.sum
