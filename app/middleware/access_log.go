@@ -3,7 +3,7 @@ package middleware
 import (
 	"bytes"
 	"gin-web/app/vars"
-	"gin-web/libraty/logger"
+	"gin-web/library/logger"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 	"strings"

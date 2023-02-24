@@ -2,8 +2,8 @@ package config
 
 import (
 	"gin-web/app/vars"
-	ci "gin-web/libraty/config/interface"
-	"gin-web/libraty/container"
+	ci "gin-web/library/config/interface"
+	"gin-web/library/container"
 	"github.com/fsnotify/fsnotify"
 	"github.com/spf13/viper"
 	"log"

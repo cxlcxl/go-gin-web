@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"gin-web/app/vars"
-	"gin-web/libraty/redis"
+	"gin-web/library/redis"
 	"time"
 
 	"gorm.io/gorm"

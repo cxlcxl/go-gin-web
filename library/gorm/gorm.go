@@ -3,10 +3,15 @@ package gorm
 import (
 	"fmt"
 	"gin-web/app/vars"
+	glog "gin-web/library/logger"
+	"strings"
 	"time"
+
+	"github.com/sirupsen/logrus"
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
 // GetMysqlClient 创建 MYSQL
@@ -16,7 +21,10 @@ func GetMysqlClient() (*gorm.DB, error) {
 	gormDb, err := gorm.Open(dia, &gorm.Config{
 		SkipDefaultTransaction: true,
 		PrepareStmt:            true,
-		//Logger:                 redefineLog(sqlType), // 拦截、接管 gorm v2 自带日志
+		Logger: logger.New(&GormLog{}, logger.Config{
+			SlowThreshold: time.Second * time.Duration(vars.YmlConfig.GetInt("Mysql.SlowQuery")),
+			LogLevel:      logger.Warn,
+		}),
 	})
 	if err != nil {
 		//gorm 数据库驱动初始化失败
@@ -43,4 +51,18 @@ func getMysqlDsn() string {
 	DataBase := vars.YmlConfig.GetString("Mysql.Database")
 	Charset := vars.YmlConfig.GetString("Mysql.Charset")
 	return fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=%s&parseTime=True&loc=Local", User, Pass, Host, Port, DataBase, Charset)
+}
+
+type GormLog struct{}
+
+func (gl *GormLog) Printf(format string, v ...interface{}) {
+	info := fmt.Sprintf(format, v...)
+	level := logrus.InfoLevel
+	if strings.HasPrefix(format, "[error]") || strings.HasPrefix(format, "[traceErr]") {
+		level = logrus.ErrorLevel
+	} else if strings.HasPrefix(format, "[warn]") || strings.HasPrefix(format, "[traceWarn]") {
+		level = logrus.WarnLevel
+	}
+	glog.NewLog(level, "mysql-gorm-log").Log(logrus.Fields{}, info)
+	return
 }

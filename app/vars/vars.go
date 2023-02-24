@@ -1,8 +1,8 @@
 package vars
 
 import (
-	ci "gin-web/libraty/config/interface"
-	"gin-web/libraty/redis"
+	ci "gin-web/library/config/interface"
+	"gin-web/library/redis"
 	"github.com/casbin/casbin/v2"
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
