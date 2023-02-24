@@ -1,0 +1,99 @@
+version: "3.9"
+services:
+  redis:
+    container_name: local_redis
+    image: redis:5.0 
+    ports:
+      - "6379:6379"
+    networks:
+      - local_docker
+    restart: always
+    volumes:
+      - "${SERVER_PATH}/redis/redis.conf:/usr/local/etc/redis/redis.conf"
+      - "${SERVER_PATH}/redis/log:/var/log/redis"
+      - "${SERVER_PATH}/redis/data:/data/log/redis"
+    sysctls:
+      - net.core.somaxconn=2048
+    tty: true 
+
+  nginx:
+    container_name: local_nginx
+    image: silentcxl/nginx:v1
+    ports:
+      - "80:80"
+      - "8001:8001"
+    networks:
+      - local_docker
+    tty: true
+    volumes:
+      - "${SERVER_PATH}/nginx/conf:/etc/nginx/conf.d" # 映射所有配置文件
+      - "${WEB_PATH}:/usr/share/nginx/html"
+      - "${SERVER_PATH}/nginx/log:/var/log/nginx"
+    restart: always
+  
+  php70:
+    container_name: local_php70 # 容器名称，后期请不要使用版本信息作为
+    #build:
+    #  context: ${SERVER_IMAGES_BASH}/php/7.0
+    image: silentcxl/phpyaf70:v1 # 自建镜像，通过 Dockerfile 构建，安装 yaf 扩展
+    networks:
+      - local_docker
+    ports:
+      - "9000:9000"
+    restart: always
+    tty: true
+    volumes:
+      - "${WEB_PATH}:/var/www/html"
+      - "${SERVER_PATH}/php/7.0/php.ini:/usr/local/etc/php/php.ini"
+      #- "${SERVER_PATH}/php/7.0/www.conf:/usr/local/etc/php-fpm.d/www.conf"
+
+  mysql:
+   container_name: local_mysql
+   image: silentcxl/mysql_57:v1
+   #build:
+   #  context: ${SERVER_IMAGES_BASH}/mysql
+   ports:
+     - "3306:3306"
+   networks:
+     - local_docker
+   tty: true
+   environment:
+     MYSQL_ROOT_PASSWORD: "root"
+   volumes:
+     - "${SERVER_PATH}/mysql/my.cnf:/etc/mysql/conf.d/my.cnf"
+     - "${SERVER_PATH}/mysql/data:/var/lib/mysql"
+   restart: always
+    #command:
+      #- "mysqld --privileged=true --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci"
+
+  # zookeeper:
+  #   image: docker.io/bitnami/zookeeper:3.8
+  #   ports:
+  #     - "2181:2181"
+  #   volumes:
+  #     - "${SERVER_PATH}:/bitnami"
+  #   environment:
+  #     - ALLOW_ANONYMOUS_LOGIN=yes
+
+  # kafka:
+  #   image: docker.io/bitnami/kafka:3.3
+  #   ports:
+  #     - "9092:9092"
+  #   volumes:
+  #     - "${SERVER_PATH}:/bitnami"
+  #   environment:
+  #     - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
+  #     - ALLOW_PLAINTEXT_LISTENER=yes
+  #   depends_on:
+  #     - zookeeper
+
+  # kafka_manager:
+  #   image: sheepkiller/kafka-manager:latest
+  #   ports:
+  #     - "9999:9000"
+  #   environment:
+  #     - ZK_HOSTS=zookeeper:2181
+  #     - APPLICATION_SECRET=letmein
+
+networks:
+  local_docker:
