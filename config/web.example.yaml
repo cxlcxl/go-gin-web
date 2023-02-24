@@ -1,0 +1,49 @@
+Debug: true
+HttpServer:
+  Port: ":18081"
+  CrossDomain: true # 是否允许跨域
+
+Token:
+  Sign: "go_gin_web"
+  ExpiresAt: 259200
+
+Mysql:
+  Host: "127.0.0.1"
+  Port: 3306
+  Database: "go_gin_web"
+  Username: "root"
+  Password: "root"
+  Charset: "utf8mb4"
+  SetMaxIdleConns: 10
+  SetMaxOpenConns: 128
+  SetConnMaxLifetime: 60
+  ReadWrite: 0 # 1开启，0关闭
+  SlowQuery: 2 # 慢 SQL
+
+Redis:
+  Host: "127.0.0.1:6379"
+  Password:
+  Db: 0
+  KeyPrefix: "go_gin_web:"
+  BLDataNumber: 100000
+  BLFalsePositive: 0.01
+  BLKeyPrefix: "go_gin_web:filter:"
+  ExpireTime: 3600 # s
+
+Casbin:
+  RefreshTime: 120 # s
+  TableName: "casbin_permissions"
+
+Kafka:
+  Host: "127.0.0.1:9092"
+
+Logs:
+  SysLog: "./storage/logs/syslog"
+  Format: "json"
+  SplitAge: 24 # 日志切割时长 /h
+  LogAge: 15 # 保留旧日志最大天数
+
+FileUploadSetting:
+  Size: 500 # 单位 KB
+  UploadPath: "/storage/app/upload"
+  ReturnPath: "/web/storage/upload"
